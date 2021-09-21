@@ -25,7 +25,8 @@ linreg = setRefClass(
     se_r = "numeric",
     df = "numeric",
     t = "vector",
-    p = "vector"),
+    p = "vector",
+    i = "numeric"),
   methods = list(
     initialize = function(formula, data) {
       "The constructor will return an object of class linreg."
@@ -58,6 +59,7 @@ linreg = setRefClass(
       .self$df = degf
       .self$t = as.vector(t_val)
       .self$p = as.vector(p_val)
+      .self$i = 1
     },
     coef = function() {
       "Returns the coefficients."
@@ -79,15 +81,20 @@ linreg = setRefClass(
     },
     summary = function() {
       "Prints a summary of the model."
-      for (i in 1:length(.self$coeff)) {
-        cat(paste(names(.self$coeff)[i],
-                  round(.self$coeff[i], 2),
-                  round(.self$se_c[i], 2),
-                  round(.self$t[i], 2),
-                  round(.self$p[i], 2), "\n"))
+      #for (i in 1:length(.self$coeff)) {
+      if (.self$i <= length(.self$coeff)) {
+        cat(paste0(names(.self$coeff)[.self$i], " ",
+                  round(.self$coeff[.self$i], 2), " ",
+                  round(.self$se_c[.self$i], 2), " ",
+                  round(.self$t[.self$i], 2), " ",
+                  round(.self$p[.self$i], 2), "\n"))
+        .self$i = .self$i + 1
       }
-      cat(paste0("Residual standard error: ", round(.self$se_r, 2),
+      else {
+        cat(paste0("Residual standard error: ", round(.self$se_r, 2),
                  " on ", .self$df, " degrees of freedom\n"))
+        .self$i = 1
+      }
     },
     plot = function() {
       "Plots two graphs; residuals vs fitted values, and scale-location."
@@ -114,7 +121,7 @@ linreg = setRefClass(
           axis.text.y = ggplot2::element_text(angle = 90, hjust = .5),
           plot.title = ggplot2::element_text(hjust = .5)
         )
-      residuals_vs_fitted
+      base::print(residuals_vs_fitted)
 
       df_resi = df_resi[order(df_resi$rows),]
       df_resi$Residuals = sqrt(abs(.self$resi / .self$se_r))
@@ -136,5 +143,5 @@ linreg = setRefClass(
           axis.text.y = ggplot2::element_text(angle = 90, hjust = .5),
           plot.title = ggplot2::element_text(hjust = .5)
         )
-      scale_location
+      base::print(scale_location)
     }))
