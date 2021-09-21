@@ -1,0 +1,84 @@
+---
+title: "Linear Regression"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Linear Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lab4package)
+```
+
+# Description
+This linear regression package contains a reference class
+which computes the coefficients, residuals, predicted values,
+standard errors for both the coefficients and the residuals,
+t-values and p-values, and the degrees of freedom of a model
+matrix based on a provided formula and data set.
+
+## Reference Class
+The reference class is called "linreg". It can be created by supplying a formula and a data set like so:
+```{r}
+data("iris")
+
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+```
+After the class has been created, several functions can be called.
+
+### Functions
+#### coef()
+The coef() function returns a named vector of coefficients.
+```{r}
+data("iris")
+linreg_mod <- linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$coef()
+```
+
+#### pred()
+The pred() function returns the predicted values.
+```{r}
+data("iris")
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$pred()
+```
+
+#### resid()
+The resid() function returns the predicted values.
+```{r}
+data("iris")
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$resid()
+```
+
+#### print()
+The print() function shows how the function was called and also prints the coefficients.
+```{r}
+data("iris")
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$print()
+```
+
+#### summary()
+The summary() function shows a detailed overview of all the relevant variables.
+```{r}
+data("iris")
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$summary()
+```
+
+#### plot()
+The plot() function displays two graphs; the first graph shows the relationship between the residuals and the fitted values, and the second graph shows the scale-location.
+```{r}
+data("iris")
+linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod$plot()
+```
