@@ -1,3 +1,17 @@
+#' A Reference Class for linear regression
+#'
+#' @description This linear regression reference class will compute
+#' the coefficients, residuals, predicted values, standard errors
+#' for both the coefficients and the residuals, t-values and
+#' p-values, and the degrees of freedom of a model matrix based
+#' on the provided formula and data set.
+#'
+#' @field formula A formula object
+#' @field data A data set
+#'
+#' @importFrom ggplot2 ggplot aes geom_point stat_summary geom_hline geom_text xlab ylab labs scale_y_continuous theme element_blank element_rect rel unit element_text
+#' @export
+
 linreg = setRefClass(
   "linreg",
   fields = list(
@@ -14,13 +28,14 @@ linreg = setRefClass(
     p = "vector"),
   methods = list(
     initialize = function(formula, data) {
+      "The constructor will return an object of class linreg."
       X = model.matrix(formula, data)
       y = all.vars(formula)
 
       X_T = t(X)
       X_I = solve(X_T %*% X)
       y = data[[all.vars(formula)[1]]]
-      
+
       coef = X_I %*% X_T %*% y
       pred = X %*% coef
       resid = y - pred
@@ -31,7 +46,7 @@ linreg = setRefClass(
       std_err_coef = sqrt(var_coef[var_coef > 0])
       t_val = coef / std_err_coef
       p_val = pt(-abs(t_val), degf)
-      
+
       .self$formula = formula
       .self$data = deparse(substitute(data))
       .self$coeff = as.vector(coef)
@@ -45,20 +60,25 @@ linreg = setRefClass(
       .self$p = as.vector(p_val)
     },
     coef = function() {
+      "Returns the coefficients."
       return(.self$coeff)
     },
     pred = function() {
+      "Returns the predicted values."
       return(.self$predi)
     },
     resid = function() {
+      "Returns the residuals."
       return(.self$resi)
     },
     print = function() {
+      "Prints how the function was called and the coefficients."
       cat(paste0("linreg(formula = ", format(.self$formula),
                  ", data = ", .self$data, ")\n"))
       base::print(.self$coeff)
     },
     summary = function() {
+      "Prints a summary of the model."
       for (i in 1:length(.self$coeff)) {
         cat(paste(names(.self$coeff)[i],
                   round(.self$coeff[i], 2),
@@ -70,13 +90,14 @@ linreg = setRefClass(
                  " on ", .self$df, " degrees of freedom\n"))
     },
     plot = function() {
+      "Plots two graphs; residuals vs fitted values, and scale-location."
       df_resi = as.data.frame(.self$resi)
       df_resi$Fitted = .self$predi
       colnames(df_resi) = c("Residuals", "Fitted")
       df_resi$rows = as.numeric(rownames(df_resi))
       df_resi$absolute = abs(.self$resi)
       df_resi = df_resi[order(-df_resi$absolute),]
-      
+
       residuals_vs_fitted = ggplot2::ggplot(df_resi, ggplot2::aes(x = Fitted, y = Residuals)) +
         ggplot2::geom_point(shape = 1, alpha = 0.3, colour = "black", fill = "white", size = 2) +
         ggplot2::stat_summary(fun = "median", colour = "red", geom = "line") +
@@ -94,11 +115,11 @@ linreg = setRefClass(
           plot.title = ggplot2::element_text(hjust = .5)
         )
       residuals_vs_fitted
-      
+
       df_resi = df_resi[order(df_resi$rows),]
       df_resi$Residuals = sqrt(abs(.self$resi / .self$se_r))
       df_resi = df_resi[order(-df_resi$absolute),]
-      
+
       scale_location = ggplot2::ggplot(df_resi, ggplot2::aes(x = Fitted, y = Residuals)) +
         ggplot2::geom_point(shape = 1, alpha = 0.3, colour = "black", fill = "white", size = 2) +
         ggplot2::stat_summary(fun = "mean", colour = "red", geom = "line") +
