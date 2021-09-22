@@ -29,7 +29,6 @@ matrix based on a provided formula and data set.
 The reference class is called "linreg". It can be created by supplying a formula and a data set like so:
 ```{r}
 data("iris")
-
 linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
 ```
 After the class has been created, several functions can be called.
@@ -79,6 +78,6 @@ linreg_mod$summary()
 The plot() function displays two graphs; the first graph shows the relationship between the residuals and the fitted values, and the second graph shows the scale-location.
 ```{r}
 data("iris")
-linreg_mod = linreg$new(Petal.Length~Sepal.Width+Sepal.Length, iris)
+linreg_mod = linreg$new(Petal.Length~Species, iris)
 linreg_mod$plot()
 ```

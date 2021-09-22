@@ -10,7 +10,7 @@
 #' @field data A data set
 #'
 #' @importFrom ggplot2 ggplot aes geom_point stat_summary geom_hline geom_text xlab ylab labs scale_y_continuous theme element_blank element_rect rel unit element_text
-#' @export
+#' @export linreg
 
 linreg = setRefClass(
   "linreg",
@@ -25,8 +25,7 @@ linreg = setRefClass(
     se_r = "numeric",
     df = "numeric",
     t = "vector",
-    p = "vector",
-    i = "numeric"),
+    p = "vector"),
   methods = list(
     initialize = function(formula, data) {
       "The constructor will return an object of class linreg."
@@ -59,7 +58,6 @@ linreg = setRefClass(
       .self$df = degf
       .self$t = as.vector(t_val)
       .self$p = as.vector(p_val)
-      .self$i = 1
     },
     coef = function() {
       "Returns the coefficients."
@@ -75,26 +73,33 @@ linreg = setRefClass(
     },
     print = function() {
       "Prints how the function was called and the coefficients."
-      cat(paste0("linreg(formula = ", format(.self$formula),
-                 ", data = ", .self$data, ")\n"))
+      cat(paste0("\nCall:\nlinreg(formula = ", format(.self$formula),
+                 ", data = ", .self$data, ")\n\nCoefficients:\n"))
       base::print(.self$coeff)
     },
     summary = function() {
       "Prints a summary of the model."
-      #for (i in 1:length(.self$coeff)) {
-      if (.self$i <= length(.self$coeff)) {
-        cat(paste0(names(.self$coeff)[.self$i], " ",
-                  round(.self$coeff[.self$i], 2), " ",
-                  round(.self$se_c[.self$i], 2), " ",
-                  round(.self$t[.self$i], 2), " ",
-                  round(.self$p[.self$i], 2), "\n"))
-        .self$i = .self$i + 1
+      signif = c()
+      for (i in 1:length(.self$t)) {
+        t_left = -abs(.self$t[i])
+        if (t_left < 0.001) { signif[i] = "***" }
+        else if (t_left < 0.01) { signif[i] = "**" }
+        else if (t_left < 0.05) { signif[i] = "*" }
+        else if (t_left < 0.1) { signif[i] = "." }
+        else { signif[i] = " " }
       }
-      else {
-        cat(paste0("Residual standard error: ", round(.self$se_r, 2),
+      sum = data.frame(
+        x = round(.self$coeff, 2),
+        y = round(.self$se_c, 2),
+        z = round(.self$t, 2),
+        w = signif
+      )
+      rownames(sum) = names(.self$coeff)
+      colnames(sum) = c("Estimate", "Std. Error",
+                        "t value", "signif")
+      base::print(sum)
+      cat(paste0("Residual standard error: ", round(.self$se_r, 2),
                  " on ", .self$df, " degrees of freedom\n"))
-        .self$i = 1
-      }
     },
     plot = function() {
       "Plots two graphs; residuals vs fitted values, and scale-location."
